@@ -1,0 +1,11 @@
+## Creating conda environment
+conda create -n data_eng_project1 python=3.7
+
+## Installing PostgreSQL
+conda install -c anaconda postgresql
+
+## Install requirements
+pip install -r requirements.txt
+
+## Install Jupyter Kernel
+ipython kernel install --user --name=data_eng_project1

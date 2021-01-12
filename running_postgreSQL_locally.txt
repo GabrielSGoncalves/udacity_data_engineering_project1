@@ -1,0 +1,15 @@
+## Running PostgreSQL locally
+# https://pythonspot.com/python-database-postgresql/
+
+# install Postgres
+sudo apt-get install postgresql postgresql-contrib
+
+# Checando o Status
+sudo /etc/init.d/postgresql status
+
+# To start 
+sudo service postgresql start
+
+# Create user user and database
+sudo -u postgres createuser -D -A -P student
+sudo -u postgres createdb -O student sparkifydb
