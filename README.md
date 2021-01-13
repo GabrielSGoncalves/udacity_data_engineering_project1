@@ -35,5 +35,7 @@ pip install -r requirements.txt
 ```
 
 ## 3.1. Install Jupyter Kernel
+```
 ipython kernel install --user --name=data_eng_project1
+```
 
