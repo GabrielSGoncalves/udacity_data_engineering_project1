@@ -1,5 +1,4 @@
 # DROP TABLES
-
 songplay_table_drop = "DROP table IF EXISTS songplays"
 user_table_drop = "DROP table IF EXISTS users"
 song_table_drop = "DROP table IF EXISTS songs"
@@ -7,7 +6,6 @@ artist_table_drop = "DROP table IF EXISTS artists"
 time_table_drop = "DROP table IF EXISTS time"
 
 # CREATE TABLES
-
 songplay_table_create = """
 CREATE TABLE IF NOT EXISTS songplays (
     songplay_id int,
@@ -44,7 +42,7 @@ CREATE TABLE IF NOT EXISTS songs (
 
 artist_table_create = """
 CREATE TABLE IF NOT EXISTS artists (
-    artist_id int,
+    artist_id varchar,
     name varchar,
     location varchar,
     latitude numeric,
@@ -78,6 +76,8 @@ INSERT INTO songs ("song_id", "title", "artist_id", "year", "duration") \
 """
 
 artist_table_insert = """
+INSERT INTO artists ("artist_id", "name", "location", "latitude", "longitude") \
+     VALUES (%s, %s, %s, %s, %s)
 """
 
 
