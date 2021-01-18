@@ -34,36 +34,53 @@ def create_database():
     return cur, conn
 
 
-def drop_tables(cur, conn):
+def drop_tables(cur: psycopg2.cursor, conn: psycopg2.connect) -> None:
     """
     Drops each table using the queries in `drop_table_queries` list.
+
+    Parameters
+    ----------
+
+    cur : psycopg2.cursor
+        Cursor for accessing database with psycopg.
+
+    conn : psycopg2.connect
+        Database connection instance.
     """
     for query in drop_table_queries:
         cur.execute(query)
         conn.commit()
 
 
-def create_tables(cur, conn):
+def create_tables(cur: psycopg2.cursor, conn: psycopg2.connect) -> None:
     """
-    Creates each table using the queries in `create_table_queries` list. 
+    Creates each table using the queries in `create_table_queries` list.
+
+    Parameters
+    ----------
+
+    cur : psycopg2.cursor
+        Cursor for accessing database with psycopg.
+
+    conn : psycopg2.connect
+        Database connection instance. 
     """
     for query in create_table_queries:
         cur.execute(query)
         conn.commit()
 
 
-def main():
+def main() -> None:
     """
-    - Drops (if exists) and Creates the sparkify database. 
-    
-    - Establishes connection with the sparkify database and gets
+    Main function for creating database tables.
+
+    The following steps are performed sequentially:
+    1. Drops (if exists) and Creates the sparkify database. 
+    2. Establishes connection with the sparkify database and gets
     cursor to it.  
-    
-    - Drops all the tables.  
-    
-    - Creates all tables needed. 
-    
-    - Finally, closes the connection. 
+    3. Drops all the tables.  
+    4. Creates all tables needed. 
+    5. Finally, closes the connection. 
     """
     cur, conn = create_database()
 
