@@ -34,7 +34,7 @@ def create_database():
     return cur, conn
 
 
-def drop_tables(cur: psycopg2.cursor, conn: psycopg2.connect) -> None:
+def drop_tables(cur: psycopg2.connect, conn: psycopg2.connect) -> None:
     """
     Drops each table using the queries in `drop_table_queries` list.
 
@@ -52,7 +52,7 @@ def drop_tables(cur: psycopg2.cursor, conn: psycopg2.connect) -> None:
         conn.commit()
 
 
-def create_tables(cur: psycopg2.cursor, conn: psycopg2.connect) -> None:
+def create_tables(cur: psycopg2.connect, conn: psycopg2.connect) -> None:
     """
     Creates each table using the queries in `create_table_queries` list.
 
