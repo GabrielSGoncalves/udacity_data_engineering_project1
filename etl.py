@@ -4,17 +4,35 @@ import psycopg2
 import pandas as pd
 from sql_queries import *
 
+def process_song_file(cur: psycopg2.connect, filepath: str) -> None:
+    """Extract and load data for song and artist from log files.
 
-def process_song_file(cur, filepath):
+    Parameters
+    ----------
+    cur: psycopg2.connect
+        Psycopg2 database cursor for inserting data.
+
+    filepath: str
+        Path for log file.
+
+    """
     # open song file
-    df = 
+    df = pd.read_json(filepath, lines=True)
 
     # insert song record
-    song_data = 
+    song_data = df.loc[0, ['song_id', 
+                           'title',
+                           'artist_id',
+                           'year',
+                           'duration']].astype(str).tolist()
     cur.execute(song_table_insert, song_data)
     
     # insert artist record
-    artist_data = 
+    artist_data = df.loc[0, ['artist_id',
+                             'artist_name',
+                             'artist_location',
+                             'artist_latitude',
+                             'artist_longitude']].iloc[0].values.tolist()
     cur.execute(artist_table_insert, artist_data)
 
 
