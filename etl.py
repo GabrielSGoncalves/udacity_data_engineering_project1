@@ -4,6 +4,7 @@ import psycopg2
 import pandas as pd
 from sql_queries import *
 
+
 def process_song_file(cur: psycopg2.connect, filepath: str) -> None:
     """Extract and load data for song and artist from log files.
 
@@ -20,22 +21,28 @@ def process_song_file(cur: psycopg2.connect, filepath: str) -> None:
     df = pd.read_json(filepath, lines=True)
 
     # insert song record
-    song_data = df.loc[0, ['song_id', 
-                           'title',
-                           'artist_id',
-                           'year',
-                           'duration']].astype(str).tolist()
+    song_data = (
+        df.loc[0, ['song_id', 'title', 'artist_id', 'year', 'duration']]
+        .astype(str)
+        .tolist()
+    )
     cur.execute(song_table_insert, song_data)
-    
+
     # insert artist record
-    artist_data = df.loc[0, ['artist_id',
-                             'artist_name',
-                             'artist_location',
-                             'artist_latitude',
-                             'artist_longitude']].iloc[0].values.tolist()
+    artist_data = df.loc[
+        0,
+        [
+            'artist_id',
+            'artist_name',
+            'artist_location',
+            'artist_latitude',
+            'artist_longitude',
+        ],
+    ].values.tolist()
     cur.execute(artist_table_insert, artist_data)
 
 
+"""
 def process_log_file(cur, filepath):
     # open log file
     df = 
@@ -76,14 +83,15 @@ def process_log_file(cur, filepath):
         # insert songplay record
         songplay_data = 
         cur.execute(songplay_table_insert, songplay_data)
+"""
 
 
 def process_data(cur, conn, filepath, func):
     # get all files matching extension from directory
     all_files = []
     for root, dirs, files in os.walk(filepath):
-        files = glob.glob(os.path.join(root,'*.json'))
-        for f in files :
+        files = glob.glob(os.path.join(root, '*.json'))
+        for f in files:
             all_files.append(os.path.abspath(f))
 
     # get total number of files found
@@ -98,7 +106,9 @@ def process_data(cur, conn, filepath, func):
 
 
 def main():
-    conn = psycopg2.connect("host=127.0.0.1 dbname=sparkifydb user=student password=student")
+    conn = psycopg2.connect(
+        "host=127.0.0.1 dbname=sparkifydb user=student password=student"
+    )
     cur = conn.cursor()
 
     process_data(cur, conn, filepath='data/song_data', func=process_song_file)
