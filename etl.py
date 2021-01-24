@@ -1,4 +1,9 @@
+"""
+Module with functions for performing ETL processes populating Sparkify SQL db.
+"""
+
 import os
+from typing import Callable
 import glob
 import psycopg2
 import pandas as pd
@@ -42,27 +47,49 @@ def process_song_file(cur: psycopg2.connect, filepath: str) -> None:
     cur.execute(artist_table_insert, artist_data)
 
 
-"""
-def process_log_file(cur, filepath):
+def process_log_file(cur: psycopg2.connect, filepath: str) -> None:
+    """Extract and load data for song and artist from log files.
+
+    Parameters
+    ----------
+    cur: psycopg2.connect
+        Psycopg2 database cursor for inserting data.
+
+    filepath: str
+        Path for log file.
+
+    """
     # open log file
-    df = 
+    df = pd.read_json(filepath, lines=True)
 
     # filter by NextSong action
-    df = 
+    df_log_time = df_log[df_log['page'] == 'NextSong']
 
     # convert timestamp column to datetime
-    t = 
-    
+    df_log_time['ts_dt'] = pd.to_datetime(df_log_time.ts, unit='ms')
+
     # insert time data records
-    time_data = 
-    column_labels = 
-    time_df = 
+    list_time_elements = ["hour",
+                     "day",
+                     "week",
+                     "month",
+                     "year",
+                     "weekday"]
+
+    for e in list_time_elements:
+        df_log_time['start_time'] = df_log_time['ts_dt']
+        df_log_time[e] = getattr(df_log_time['ts_dt'].dt, e)
+
+    column_labels = ['start_time'] + list_time_elements
+
+    time_df = df_log_time[column_labels]
 
     for i, row in time_df.iterrows():
         cur.execute(time_table_insert, list(row))
 
     # load user table
-    user_df = 
+    user_df =  df_log[df_log['page'] == 'NextSong'][
+    ['userId', 'firstName', 'lastName', 'gender', 'level']]
 
     # insert user records
     for i, row in user_df.iterrows():
@@ -81,12 +108,34 @@ def process_log_file(cur, filepath):
             songid, artistid = None, None
 
         # insert songplay record
-        songplay_data = 
+        songplay_data = (songid, artistid)
         cur.execute(songplay_table_insert, songplay_data)
-"""
 
 
-def process_data(cur, conn, filepath, func):
+
+def process_data(cur: psycopg2.connect,
+                 conn: psycopg2.connect,
+                 filepath: str,
+                 func: Callable) -> None:
+    """
+    Perform data processing for specific raw files.
+
+    Parameters
+    ----------
+    cur : psycopg2.cursor
+        Cursor for accessing database with psycopg.
+
+    conn : psycopg2.connect
+        Database connection instance.
+
+    filepath : str
+        Path for target file.
+    
+    func : Callable
+        Function to use to process file.
+
+    """
+
     # get all files matching extension from directory
     all_files = []
     for root, dirs, files in os.walk(filepath):
@@ -112,7 +161,7 @@ def main():
     cur = conn.cursor()
 
     process_data(cur, conn, filepath='data/song_data', func=process_song_file)
-    process_data(cur, conn, filepath='data/log_data', func=process_log_file)
+    #process_data(cur, conn, filepath='data/log_data', func=process_log_file)
 
     conn.close()
 
