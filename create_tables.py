@@ -21,7 +21,7 @@ def create_database():
     cur.execute(
         "CREATE DATABASE sparkifydb WITH ENCODING 'utf8' TEMPLATE template0"
     )
-    
+
     # close connection to default database
     conn.close()
     '''
@@ -63,7 +63,8 @@ def create_tables(cur: psycopg2.connect, conn: psycopg2.connect) -> None:
         Cursor for accessing database with psycopg.
 
     conn : psycopg2.connect
-        Database connection instance. 
+        Database connection instance.
+
     """
     for query in create_table_queries:
         cur.execute(query)
@@ -75,12 +76,12 @@ def main() -> None:
     Main function for creating database tables.
 
     The following steps are performed sequentially:
-    1. Drops (if exists) and Creates the sparkify database. 
+    1. Drops (if exists) and Creates the sparkify database.
     2. Establishes connection with the sparkify database and gets
-    cursor to it.  
-    3. Drops all the tables.  
-    4. Creates all tables needed. 
-    5. Finally, closes the connection. 
+    cursor to it.
+    3. Drops all the tables.
+    4. Creates all tables needed.
+    5. Finally, closes the connection.
     """
     cur, conn = create_database()
 
