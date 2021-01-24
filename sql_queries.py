@@ -35,8 +35,8 @@ CREATE TABLE IF NOT EXISTS songs (
     song_id varchar,
     title varchar,
     artist_id varchar,
-    year varchar,
-    duration varchar
+    year int,
+    duration numeric
     )
 """
 
@@ -84,18 +84,18 @@ INSERT INTO users ("user_id", "first_name", "last_name", "gender", "level")
 """
 
 song_table_insert = """
-INSERT INTO songs ("song_id", "title", "artist_id", "year", "duration") \
+INSERT INTO songs ("song_id", "title", "artist_id", "year", "duration")
      VALUES (%s, %s, %s, %s, %s)
 """
 
 artist_table_insert = """
-INSERT INTO artists ("artist_id", "name", "location", "latitude", "longitude") \
+INSERT INTO artists ("artist_id", "name", "location", "latitude", "longitude")
      VALUES (%s, %s, %s, %s, %s)
 """
 
 
 time_table_insert = """
-INSERT INTO time ("start_time", 
+INSERT INTO time ("start_time",
                   "hour",
                   "day",
                   "week",
@@ -106,7 +106,6 @@ INSERT INTO time ("start_time",
 """
 
 # FIND SONGS
-
 song_select = """
 SELECT art.name,
        son.*
@@ -114,9 +113,9 @@ SELECT art.name,
   JOIN songs as son
     ON art.artist_id = son.artist_id
  WHERE 1 = 1
-   AND title = %s
-   AND artist = %s
-   AND duration = %s  
+   AND son.title = %s
+   AND art.name = %s
+   AND son.duration = %s
 """
 
 # QUERY LISTS
