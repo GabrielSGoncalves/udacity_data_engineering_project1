@@ -7,8 +7,8 @@ def create_database():
     - Creates and connects to the sparkifydb
     - Returns the connection and cursor to sparkifydb
     """
-    """
-    # connect to default database    
+
+    # connect to default database
     conn = psycopg2.connect(
         "host=127.0.0.1 dbname=studentdb user=student password=student"
     )
@@ -23,7 +23,7 @@ def create_database():
 
     # close connection to default database
     conn.close()
-    """
+
     # connect to sparkify database
     conn = psycopg2.connect(
         "host=127.0.0.1 dbname=sparkifydb user=student password=student"
