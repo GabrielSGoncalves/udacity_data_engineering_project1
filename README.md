@@ -82,9 +82,14 @@ sudo -u postgres createdb -O student studentdb
 In order to check if the default database was successfully created we can use the following commands:
 
 ```
-sudo s postgres
+sudo -i -u postgres
+```
+
+And access `psql` command line tool to check the settings:
+
+```
 psql
-\l
+postgres=# \l
 ```
 
  You should get the following information in return:
@@ -103,6 +108,29 @@ psql
 
 ```
 
+### 2.2. Setting permissions for student user
 
+In order to allow user student to create databases we need add the following permission:
+
+```
+postgres=# ALTER USER student WITH CREATEDB;
+```
+
+Next, we can check the  user permission.
+
+```
+postgres=# \du
+```
+
+And student should appear with the Create DB attribute.
+
+```
+            List of roles
+ Role name |                         Attributes                         | Member of 
+-----------+------------------------------------------------------------+-----------
+ postgres  | Superuser, Create role, Create DB, Replication, Bypass RLS | {}
+ student   | Create DB                                                  | {}
+
+```
 
 After creating working environment and the default database we are ready to start implementing the scripts to organize data for Sparkify in a relational schema. 
