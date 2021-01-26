@@ -51,16 +51,13 @@ And start it if needed:
 ``` 
 sudo service postgresql start
 ```
-Next, we create an user an a database to use in our project.
-```
-sudo -u postgres createuser -D -A -P student
-sudo -u postgres createdb -O student sparkifydb
-```
+
 #### 1.2.3. Installing requirements
-Finally we install the Python libraries to connect to Postgres Database and perform data manipulation.
+Finally we install the Python libraries to connect to PostgreSQL Database and perform data manipulation.
 ```
 pip install -r requirements.txt
 ```
+
 #### 1.2.4. Install Jupyter Kernel
 In order to help us develop and test our code we need to install Jupyter Kernel, so that we can run the code on the created Conda environment.
 ```
@@ -70,3 +67,42 @@ ipython kernel install --user --name=data_eng_project1
 ## 2. Create the Relational Database Schema
 After setting the working environment is time to start creating the Database arquitecture to store our data.
 
+### 2.1. Creating the default database
+
+In order to run the `create_tables.py` script we need to have a default database already available, so we need to create it first.
+
+Next, we create an user an a database to use in our project.
+```
+sudo -u postgres createuser -D -A -P student
+sudo -u postgres createdb -O student studentdb
+```
+
+
+
+In order to check if the default database was successfully created we can use the following commands:
+
+```
+sudo s postgres
+psql
+\l
+```
+
+ You should get the following information in return:
+
+```
+                                  List of databases
+   Name    |  Owner   | Encoding |   Collate   |    Ctype    |   Access privileges   
+-----------+----------+----------+-------------+-------------+-----------------------
+ postgres  | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | 
+ studentdb | student  | UTF8     | en_US.UTF-8 | en_US.UTF-8 | 
+ template0 | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | =c/postgres          +
+           |          |          |             |             | postgres=CTc/postgres
+ template1 | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | =c/postgres          +
+           |          |          |             |             | postgres=CTc/postgres
+(4 rows)
+
+```
+
+
+
+After creating working environment and the default database we are ready to start implementing the scripts to organize data for Sparkify in a relational schema. 
