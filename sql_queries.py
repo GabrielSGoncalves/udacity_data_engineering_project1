@@ -8,15 +8,16 @@ time_table_drop = "DROP table IF EXISTS time"
 # CREATE TABLES
 songplay_table_create = """
 CREATE TABLE IF NOT EXISTS songplays (
-    songplay_id int,
+    songplay_id serial,
     start_time timestamp,
     user_id int,
     level varchar,
-    song_id int,
-    artist_id int,
+    song_id varchar,
+    artist_id varchar,
     session_id int,
     location varchar,
-    user_agent varchar
+    user_agent varchar,
+    PRIMARY KEY (songplay_id)
     )
 """
 
@@ -26,7 +27,8 @@ CREATE TABLE IF NOT EXISTS users (
     first_name varchar,
     last_name varchar,
     gender varchar,
-    level varchar
+    level varchar,
+    PRIMARY KEY (user_id)
     )
 """
 
@@ -36,7 +38,8 @@ CREATE TABLE IF NOT EXISTS songs (
     title varchar,
     artist_id varchar,
     year int,
-    duration numeric
+    duration float,
+    PRIMARY KEY (song_id)
     )
 """
 
@@ -65,17 +68,16 @@ CREATE TABLE IF NOT EXISTS time (
 # INSERT RECORDS
 
 songplay_table_insert = """
-INSERT INTO songplays ("songplay_id",
-                       "start_time",
+INSERT INTO songplays ("start_time",
                        "user_id",
                        "level",
                        "song_id",
                        "artist_id",
                        "session_id",
                        "location",
-                       "user_agent",
+                       "user_agent"
 )
-     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+     VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
 """
 
 user_table_insert = """
@@ -107,8 +109,8 @@ INSERT INTO time ("start_time",
 
 # FIND SONGS
 song_select = """
-SELECT art.name,
-       son.*
+SELECT son.artist_id,
+       son.song_id
   FROM artists AS art
   JOIN songs as son
     ON art.artist_id = son.artist_id

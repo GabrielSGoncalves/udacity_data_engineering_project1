@@ -27,8 +27,8 @@ def process_song_file(cur: psycopg2.connect, filepath: str) -> None:
 
     # insert song record
     song_data = (
-        df.loc[0, ['song_id', 'title', 'artist_id', 'year', 'duration']]
-        .astype(str)
+        df[['song_id', 'title', 'artist_id', 'year', 'duration']]
+        .values[0]
         .tolist()
     )
     cur.execute(song_table_insert, song_data)
@@ -61,35 +61,31 @@ def process_log_file(cur: psycopg2.connect, filepath: str) -> None:
     """
     # open log file
     df = pd.read_json(filepath, lines=True)
+    df['ts'] = pd.to_datetime(df.ts, unit='ms')
 
     # filter by NextSong action
-    df_log_time = df_log[df_log['page'] == 'NextSong']
+    df = df[df['page'] == 'NextSong']
 
     # convert timestamp column to datetime
-    df_log_time['ts_dt'] = pd.to_datetime(df_log_time.ts, unit='ms')
+    t = pd.DataFrame(pd.to_datetime(df.ts, unit='ms'))
 
     # insert time data records
-    list_time_elements = ["hour",
-                     "day",
-                     "week",
-                     "month",
-                     "year",
-                     "weekday"]
+    list_time_elements = ["hour", "day", "week", "month", "year", "weekday"]
 
     for e in list_time_elements:
-        df_log_time['start_time'] = df_log_time['ts_dt']
-        df_log_time[e] = getattr(df_log_time['ts_dt'].dt, e)
+        t['start_time'] = t['ts']
+        t[e] = getattr(t['ts'].dt, e)
 
     column_labels = ['start_time'] + list_time_elements
 
-    time_df = df_log_time[column_labels]
+    time_df = t[column_labels]
 
     for i, row in time_df.iterrows():
         cur.execute(time_table_insert, list(row))
 
     # load user table
-    user_df =  df_log[df_log['page'] == 'NextSong'][
-    ['userId', 'firstName', 'lastName', 'gender', 'level']]
+    user_df = df[['userId', 'firstName', 'lastName', 'gender', 'level']]
+    user_df = user_df.drop_duplicates()
 
     # insert user records
     for i, row in user_df.iterrows():
@@ -97,26 +93,38 @@ def process_log_file(cur: psycopg2.connect, filepath: str) -> None:
 
     # insert songplay records
     for index, row in df.iterrows():
-        
+
         # get songid and artistid from song and artist tables
         cur.execute(song_select, (row.song, row.artist, row.length))
         results = cur.fetchone()
-        
+        print('***', results)
+
         if results:
             songid, artistid = results
         else:
             songid, artistid = None, None
 
         # insert songplay record
-        songplay_data = (songid, artistid)
+        songplay_data = [
+            str(row.ts),
+            row.userId,
+            row.level,
+            songid,
+            artistid,
+            row.sessionId,
+            row.location,
+            row.userAgent,
+        ]
+        print(songplay_data)
         cur.execute(songplay_table_insert, songplay_data)
 
 
-
-def process_data(cur: psycopg2.connect,
-                 conn: psycopg2.connect,
-                 filepath: str,
-                 func: Callable) -> None:
+def process_data(
+    cur: psycopg2.connect,
+    conn: psycopg2.connect,
+    filepath: str,
+    func: Callable,
+) -> None:
     """
     Perform data processing for specific raw files.
 
@@ -161,7 +169,7 @@ def main():
     cur = conn.cursor()
 
     process_data(cur, conn, filepath='data/song_data', func=process_song_file)
-    #process_data(cur, conn, filepath='data/log_data', func=process_log_file)
+    process_data(cur, conn, filepath='data/log_data', func=process_log_file)
 
     conn.close()
 
