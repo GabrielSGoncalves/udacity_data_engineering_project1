@@ -27,8 +27,7 @@ CREATE TABLE IF NOT EXISTS users (
     first_name varchar,
     last_name varchar,
     gender varchar,
-    level varchar,
-    PRIMARY KEY (user_id)
+    level varchar
     )
 """
 
@@ -38,7 +37,7 @@ CREATE TABLE IF NOT EXISTS songs (
     title varchar,
     artist_id varchar,
     year int,
-    duration float,
+    duration numeric,
     PRIMARY KEY (song_id)
     )
 """
@@ -109,6 +108,18 @@ INSERT INTO time ("start_time",
 
 # FIND SONGS
 song_select = """
+SELECT
+    s.song_id, s.artist_id
+FROM
+    songs s
+        JOIN artists a ON s.artist_id = a.artist_id
+WHERE
+    s.title = %s
+    AND a.name = %s
+    AND s.duration = %s
+"""
+'''
+song_select = """
 SELECT son.artist_id,
        son.song_id
   FROM artists AS art
@@ -119,7 +130,7 @@ SELECT son.artist_id,
    AND art.name = %s
    AND son.duration = %s
 """
-
+'''
 # QUERY LISTS
 
 create_table_queries = [
