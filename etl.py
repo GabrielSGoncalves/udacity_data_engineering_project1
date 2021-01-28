@@ -22,28 +22,25 @@ def process_song_file(cur: psycopg2.connect, filepath: str) -> None:
         Path for log file.
 
     """
+
     # open song file
     df = pd.read_json(filepath, lines=True)
 
     # insert song record
-    song_data = (
-        df[['song_id', 'title', 'artist_id', 'year', 'duration']]
-        .values[0]
-        .tolist()
-    )
+    song_columns = ['song_id', 'title', 'artist_id', 'year', 'duration']
+    song_data = song_data = df[song_columns].values[0].tolist()
     cur.execute(song_table_insert, song_data)
 
     # insert artist record
-    artist_data = df.loc[
-        0,
-        [
-            'artist_id',
-            'artist_name',
-            'artist_location',
-            'artist_latitude',
-            'artist_longitude',
-        ],
-    ].values.tolist()
+    artist_columns = [
+        'artist_id',
+        'artist_name',
+        'artist_location',
+        'artist_latitude',
+        'artist_longitude',
+    ]
+    artist_data = df[artist_columns].values[0].tolist()
+
     cur.execute(artist_table_insert, artist_data)
 
 
@@ -59,33 +56,38 @@ def process_log_file(cur: psycopg2.connect, filepath: str) -> None:
         Path for log file.
 
     """
+
     # open log file
-    df = pd.read_json(filepath, lines=True)
-    df['ts'] = pd.to_datetime(df.ts, unit='ms')
+    df = pd.read_json(filepath, lines=True, convert_dates=['ts'])
 
     # filter by NextSong action
     df = df[df['page'] == 'NextSong']
 
     # convert timestamp column to datetime
-    t = pd.DataFrame(pd.to_datetime(df.ts, unit='ms'))
+    t = pd.to_datetime(df['ts'], unit='ms')
 
     # insert time data records
-    list_time_elements = ["hour", "day", "week", "month", "year", "weekday"]
-
-    for e in list_time_elements:
-        t['start_time'] = t['ts']
-        t[e] = getattr(t['ts'].dt, e)
-
-    column_labels = ['start_time'] + list_time_elements
-
-    time_df = t[column_labels]
+    time_data = [
+        [x, x.hour, x.day, x.week, x.month, x.year, x.dayofweek] for x in t
+    ]
+    column_labels = [
+        'start_time',
+        'hour',
+        'day',
+        'week',
+        'month',
+        'year',
+        'weekday',
+    ]
+    time_df = pd.DataFrame(time_data, columns=column_labels)
 
     for i, row in time_df.iterrows():
         cur.execute(time_table_insert, list(row))
 
     # load user table
-    user_df = df[['userId', 'firstName', 'lastName', 'gender', 'level']]
-    user_df = user_df.drop_duplicates()
+    user_df = df.filter(
+        ['userId', 'firstName', 'lastName', 'gender', 'level']
+    ).drop_duplicates()
 
     # insert user records
     for i, row in user_df.iterrows():
@@ -93,11 +95,9 @@ def process_log_file(cur: psycopg2.connect, filepath: str) -> None:
 
     # insert songplay records
     for index, row in df.iterrows():
-
         # get songid and artistid from song and artist tables
         cur.execute(song_select, (row.song, row.artist, row.length))
         results = cur.fetchone()
-        print('***', results)
 
         if results:
             songid, artistid = results
@@ -106,7 +106,7 @@ def process_log_file(cur: psycopg2.connect, filepath: str) -> None:
 
         # insert songplay record
         songplay_data = [
-            str(row.ts),
+            row.ts,
             row.userId,
             row.level,
             songid,
@@ -115,7 +115,6 @@ def process_log_file(cur: psycopg2.connect, filepath: str) -> None:
             row.location,
             row.userAgent,
         ]
-        print(songplay_data)
         cur.execute(songplay_table_insert, songplay_data)
 
 
