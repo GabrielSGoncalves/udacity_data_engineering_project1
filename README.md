@@ -65,7 +65,7 @@ ipython kernel install --user --name=data_eng_project1
 ```
 ---
 ## 2. Create the Relational Database Schema
-After setting the working environment is time to start creating the Database arquitecture to store our data.
+After setting the working environment is time to start creating the Database architecture to store our data.
 
 ### 2.1. Creating the default database
 
@@ -134,3 +134,46 @@ And student should appear with the Create DB attribute.
 ```
 
 After creating working environment and the default database we are ready to start implementing the scripts to organize data for Sparkify in a relational schema. 
+
+### 2.3. Creating the database and tables
+
+The file `create_tables.py` has the instructions for creating the database and tables. To execute it:
+
+```
+python create_tables.py
+```
+
+## 3. Creating the ETL code for loading data into tables
+
+With the tables available, the next step consist in extracting, transforming and loading data into it. This process is also known as ETL (acronym for Extract, Transform and Load) and is coded in the `etl.py` file.
+
+```
+create etl.py
+```
+
+To check if the creation was successful you can run `test.ipynb` Jupyter Notebook.
+
+
+
+## 4. Validating the data with SQL queries
+
+Finally, in order to check if the process of creation and loading of data into the database we can use a few queries to aggregate data. You can perform the following queries using the `test.ipynb` Notebook using the `%sql` magic command.
+
+- Get rows with  artist_id and song_id not null:
+
+```sql
+%sql SELECT * FROM songplays where song_id is NOT NULL and artist_id is NOT NULL
+```
+
+- Number of unique artists in artists table:
+
+```sql
+SELECT COUNT(DISTINCT name) FROM artists
+```
+
+
+
+## 5. Final thoughts
+
+Throughout this project we have reviewed a few key concepts in Relational Database modeling by creating a new schema and parsing and adding data to it. We followed good practices in terms of database normalization and code formatting.
+
